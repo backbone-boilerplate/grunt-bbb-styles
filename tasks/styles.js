@@ -60,29 +60,19 @@ module.exports = function(grunt) {
     }).concat(options.additional || []);
 
     function additionalProcessing(css, filepath) {
-      var stylesheet = cssom.parse(css);
-      var url = /url\("(.*)"\)/;
+      var url =/(url\([\'"]?)((?:[^\);](?!base64))+)([\'"]?\))/g;
       var dir = path.dirname(filepath);
       var rel = options.forceRelative;
 
       // Augment paths if a forceRelative path is specificed.
       if (options.hasOwnProperty("forceRelative")) {
-        stylesheet.cssRules.forEach(function(rule) {
-          // Iterate over all styles and find all `url` values.
-          [].slice.apply(rule.style || []).forEach(function(key) {
-            var value = rule.style[key];
-            var match;
 
-            // Replace the image paths.
-            if (match = value.match(url)) {
-              value = value.replace(match[1], rel + path.join(dir, match[1]));
-              rule.style[key] = value;
-            }
-          });
+        // Search the content for the url pattern
+        // and call our function to dynamically create
+        // a replacement
+        return css.replace(url, function(match, p1, p2, p3){
+          return p1 + rel + path.join(dir, p2) + p3;
         });
-
-        // Return the normalized data.
-        return stylesheet.toString();
       }
 
       return css;
