@@ -75,7 +75,13 @@ module.exports = function(grunt) {
 
             // Replace the image paths.
             if (match = value.match(url)) {
-              value = value.replace(match[1], rel + path.join(dir, match[1]));
+
+              // Since we are forcing a relative path, we should discard paths 
+              // already present in given URL and only use the actual filename
+              var filename = match[1].split("/");
+              filename = filename[filename.length-1];
+              value = value.replace(match[1], rel + filename);
+
               rule.style[key] = value;
             }
           });
