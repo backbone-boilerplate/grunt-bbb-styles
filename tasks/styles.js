@@ -64,6 +64,7 @@ module.exports = function(grunt) {
       var url = /url\("(.*)"\)/;
       var dir = path.dirname(filepath);
       var rel = options.forceRelative;
+      var replacePath = options.replacePath;
 
       // Augment paths if a forceRelative path is specificed.
       if (options.hasOwnProperty("replacePath")) {
@@ -80,7 +81,7 @@ module.exports = function(grunt) {
               // already present in given URL and only use the actual filename
               var filename = match[1].split("/");
               filename = filename[filename.length-1];
-              value = value.replace(match[1], rel + filename);
+              value = value.replace(match[1], replacePath + filename);
 
               rule.style[key] = value;
             }
