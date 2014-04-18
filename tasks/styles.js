@@ -66,7 +66,7 @@ module.exports = function(grunt) {
       var rel = options.forceRelative;
 
       // Augment paths if a forceRelative path is specificed.
-      if (options.hasOwnProperty("forceRelative")) {
+      if (options.hasOwnProperty("replacePath")) {
         stylesheet.cssRules.forEach(function(rule) {
           // Iterate over all styles and find all `url` values.
           [].slice.apply(rule.style || []).forEach(function(key) {
@@ -82,6 +82,26 @@ module.exports = function(grunt) {
               filename = filename[filename.length-1];
               value = value.replace(match[1], rel + filename);
 
+              rule.style[key] = value;
+            }
+          });
+        });
+
+        // Return the normalized data.
+        return stylesheet.toString();
+      }
+
+      // Augment paths if a forceRelative path is specificed.
+      if (options.hasOwnProperty("forceRelative")) {
+        stylesheet.cssRules.forEach(function(rule) {
+          // Iterate over all styles and find all `url` values.
+          [].slice.apply(rule.style || []).forEach(function(key) {
+            var value = rule.style[key];
+            var match;
+
+            // Replace the image paths.
+            if (match = value.match(url)) {
+              value = value.replace(match[1], rel + path.join(dir, match[1]));
               rule.style[key] = value;
             }
           });
